@@ -65,3 +65,9 @@ class AIChatServiceV2(AIChatService):
         }
         """
         return resp
+
+    #chat window which will be displayed near the yt video. We need to implement context management and RAG for longer videos.
+    def ask_yt_bot(self, question: str, transcript: str) -> str:
+        resp={
+            "AI_Response": "I am a dummy for now, will answer once i am smart enough",
+        }
