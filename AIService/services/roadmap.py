@@ -1,4 +1,5 @@
 from services.text import AITextProcessor
+from langchain_openai import ChatOpenAI
 #for creating a json graph
 class AIRoadmapService(AITextProcessor):
 
@@ -6,5 +7,5 @@ class AIRoadmapService(AITextProcessor):
 
     #def make_changes_to_roadmap()
 
-    #def build_lesson()
+    #def build_lesson() - fetch_yt, generate_quiz,transcribe
 
