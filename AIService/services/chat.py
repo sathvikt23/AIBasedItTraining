@@ -1,4 +1,5 @@
 from all_in_one.LLMservice import GeminiClient
+from typing_extensions import override
 class AIChatService:
     def __init__(self,llm_client=None):
         if (llm_client==None):
@@ -41,3 +42,32 @@ class AIChatService:
             raise Exception(str(e)) from e
         except Exception as e:
             raise Exception(f"Lesson chat failed: {e}") from e
+
+class AIChatServiceV2(AIChatService):
+    def __init__(self,llm_client=None):
+        super().__init__(llm_client)
+
+    @override
+    def chat(self, question: str) -> str:
+        resp="""
+        {
+            "AI_Response": "Hello, how can I help you today?",
+            "is_ready": true,
+            "component_name": "roadmap",
+            "metadata": {
+                "title": "My Dashboard",
+                "content": "Sample text",
+                "actions":{
+                    "build_roadmap": true,
+                    "build_book": true
+                }
+            }
+        }
+        """
+        return resp
+
+    #chat window which will be displayed near the yt video. We need to implement context management and RAG for longer videos.
+    def ask_yt_bot(self, question: str, transcript: str) -> str:
+        resp={
+            "AI_Response": "I am a dummy for now, will answer once i am smart enough",
+        }
