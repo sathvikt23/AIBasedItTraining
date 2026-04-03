@@ -1,12 +1,12 @@
-from fastapi import FastAPI, APIRouter, HTTPException,Request
-from pydantic import BaseModel
-from enum import Enum
+from fastapi import FastAPI, APIRouter, HTTPException
+import json
 from models.v1 import *
 
 from services.text import AITextProcessor
 from services.code import AICodeAnalysisService
 from services.dsa import AIDSAQuestionService
 from services.chat import AIChatService
+from services.roadmap import AIRoadmapService
 
 from all_in_one.youtubeService import youtube
 
@@ -21,6 +21,7 @@ text_service = AITextProcessor()
 code_service = AICodeAnalysisService()
 dsa_service = AIDSAQuestionService()
 chat_service = AIChatService()
+roadmap_service = AIRoadmapService()
 
 
 
@@ -86,8 +87,29 @@ async def generate_dsa_questions(request: DSAQuestionRequest):
 @router.post("/chat")
 async def chat(request: ChatRequest):
     try:
-        result = chat_service.chat(request.question)
-        return {"response": result}
+        # result = chat_service.chat(request.question)
+        # return {"response": result}
+        resp="""
+        {
+            "AI_Response": "Hello, how can I help you today?",
+            "is_ready": true,
+            "component_name": "roadmap",
+            "metadata": {
+                "title": "My Dashboard",
+                "content": "Sample text",
+                "actions":{
+                    "build_roadmap": true,
+                    "build_book": true
+                }
+            }
+        }
+        """
+
+        # `resp` is a JSON string; parse it so the API always returns a JSON object.
+        return json.loads(resp)
+
+    except json.JSONDecodeError as e:
+        return {"error": "Failed to parse chat JSON", "detail": str(e)}
 
     except HTTPException as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -123,48 +145,128 @@ async def get_video_recommendations(request: VideoRecommendationsRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/generateRoadmap")
-async def get_roadmap(request: Request):
-    data = await request.json() 
-    return {
-  "title": "Learn React",
-  "nodes": [
-    { "id": "n1", "label": "React", "type": "root", "status": "progress" },
+async def generate_roadmap(request: GenerateRoadmapRequest):
+    """
+    POST /generateRoadmap
 
-    { "id": "n2", "label": "HTML Basics", "type": "topic", "status": "done" },
-    { "id": "n3", "label": "CSS Basics", "type": "topic", "status": "done" },
-    { "id": "n4", "label": "JavaScript Fundamentals", "type": "topic", "status": "progress" },
+    Request JSON:
+    {
+      "topic": "Introduction to React"
+    }
 
-    { "id": "n5", "label": "JSX", "type": "subtopic", "status": "todo" },
-    { "id": "n6", "label": "Components", "type": "subtopic", "status": "todo" },
-    { "id": "n7", "label": "State & Props", "type": "subtopic", "status": "todo" },
+    Response JSON (success):
+    {
+      "title": "string",
+      "nodes": [
+        { "id": "string", "label": "string", "type": "string", "status": "string" }
+      ],
+      "edges": [
+        { "from": "string", "to": "string" }
+      ]
+    }
 
-    { "id": "n8", "label": "React Docs", "type": "resource", "status": "todo" },
-    { "id": "n9", "label": "React Tutorial Video", "type": "resource", "status": "todo" }
-  ],
-  "edges": [
-    { "from": "n1", "to": "n2" },
-    { "from": "n1", "to": "n3" },
-    { "from": "n1", "to": "n4" },
+    Response JSON (error):
+    { "error": "string", "detail": "string" }
+    """
+    try:
+        roadmap_payload = roadmap_service.generate_roadmap(request.topic)
 
-    { "from": "n4", "to": "n5" },
-    { "from": "n4", "to": "n6" },
-    { "from": "n4", "to": "n7" },
+        parsed = (
+            json.loads(roadmap_payload)
+            if isinstance(roadmap_payload, str)
+            else roadmap_payload
+        )
 
-    { "from": "n5", "to": "n8" },
-    { "from": "n6", "to": "n9" }
-  ]
-}
+        if not isinstance(parsed, dict):
+            return {"error": "Invalid roadmap response", "detail": "Expected JSON object"}
+
+        return parsed
+    except json.JSONDecodeError as e:
+        return {"error": "Failed to parse roadmap JSON", "detail": str(e)}
+    except Exception as e:
+        return {"error": "Roadmap generation failed", "detail": str(e)}
+
+
+@router.post("/changeRoadmap")
+async def change_roadmap(request: ChangeRoadmapRequest):
+    """
+    POST /changeRoadmap
+
+    Request JSON:
+    {
+      "topic": "string",
+      "current_roadmap": {},
+      "student_request": "string"
+    }
+
+    Response JSON (success):
+    {
+      "title": "string",
+      "nodes": [
+        { "id": "string", "label": "string", "type": "string", "status": "string" }
+      ],
+      "edges": [
+        { "from": "string", "to": "string" }
+      ]
+    }
+
+    Response JSON (error):
+    { "error": "string", "detail": "string" }
+    """
+    try:
+        roadmap_payload = roadmap_service.make_changes_to_roadmap(
+            request.topic,
+            request.current_roadmap,
+            request.student_request,
+        )
+
+        parsed = (
+            json.loads(roadmap_payload)
+            if isinstance(roadmap_payload, str)
+            else roadmap_payload
+        )
+
+        if not isinstance(parsed, dict):
+            return {"error": "Invalid roadmap response", "detail": "Expected JSON object"}
+
+        return parsed
+    except json.JSONDecodeError as e:
+        return {"error": "Failed to parse changed roadmap JSON", "detail": str(e)}
+    except Exception as e:
+        return {"error": "Roadmap change failed", "detail": str(e)}
 
 @router.post("/lesson")
-async def get_sample_lesson(request:Request):
-    data = await request.json() 
-    return {
-  "topic": "Introduction to React",
-  "content": "# Introduction to React\n\nReact is a JavaScript library...",
-  "video_id": "dQw4w9WgXcQ",
-  "past_quiz": { },
-  "past_codes": { }  
-}
+async def lesson(request: LessonRequest):
+    """
+    POST /lesson
+
+    Request JSON:
+    {
+      "topic": "Introduction to React",
+      "change_request": 0
+    }
+
+    Response JSON (success):
+    {
+      "video_id": "string",
+      "transcript": "string",
+      "quiz_questions": [
+        {
+          "question": "string",
+          "choices": ["string", "string", "string", "string"],
+          "answer": "string"
+        }
+      ]
+    }
+
+    Response JSON (error):
+    { "error": "string", "detail": "string" }
+    """
+    try:
+        # build_lesson returns a dict (already a parsed JSON object).
+        return roadmap_service.build_lesson(request.topic, request.change_request)
+    except Exception as e:
+        return {"error": "Lesson building failed", "detail": str(e)}
 app.include_router(router)
 
 

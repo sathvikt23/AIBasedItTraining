@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Any, List, Optional
 from enum import Enum
 
 class TextProcessType(str, Enum):
@@ -49,3 +49,18 @@ class TranscribeRequest(BaseModel):
 
 class VideoRecommendationsRequest(BaseModel):
     transcript: str
+
+
+class GenerateRoadmapRequest(BaseModel):
+    topic: str
+
+
+class ChangeRoadmapRequest(BaseModel):
+    topic: str
+    current_roadmap: Any
+    student_request: str
+
+
+class LessonRequest(BaseModel):
+    topic: str
+    change_request: int = 0
