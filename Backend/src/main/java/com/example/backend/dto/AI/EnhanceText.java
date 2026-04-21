@@ -1,0 +1,10 @@
+package com.example.backend.dto.AI;
+
+import lombok.Data;
+
+public class EnhanceText {
+    @Data
+    public static class Request{
+        String text ;
+    }
+}

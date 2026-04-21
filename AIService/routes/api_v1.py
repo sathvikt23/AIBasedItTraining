@@ -9,7 +9,7 @@ from services.dsa import AIDSAQuestionService
 from services.chat import AIChatService
 
 from all_in_one.youtubeService import youtube
-
+from GoogleADK.agent import call_agent
 app = FastAPI()
 router = APIRouter()
 
@@ -154,6 +154,14 @@ async def get_roadmap(request: Request):
     { "from": "n6", "to": "n9" }
   ]
 }
+class genContentQuery(BaseModel):
+    topic: str
+@router.post("/generatecontent")
+async def getContent(request:genContentQuery):
+    
+    content =text_service.generate_content(request.topic)
+    return {"content":content}
+
 
 @router.post("/lesson")
 async def get_sample_lesson(request:Request):
@@ -165,6 +173,14 @@ async def get_sample_lesson(request:Request):
   "past_quiz": { },
   "past_codes": { }  
 }
+class QueryRequest(BaseModel):
+    query: str
+@router.post("/ask_aiagent")
+async def ask_aigent(req: QueryRequest):
+    return {
+        "response": call_agent(req.query)
+    }
 app.include_router(router)
 
 
+#should be integrate to  frontend a,d java get by lesson id youtube url is not set 
