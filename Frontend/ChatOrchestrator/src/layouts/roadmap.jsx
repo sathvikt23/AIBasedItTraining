@@ -213,7 +213,7 @@ function Roadmap({ metadata = {} }) {
     setAcceptStatus("");
 
     try {
-      await axios.post("http://localhost:8082/acceptroadmap", {
+      await axios.post("http://localhost:8082/api/roadmap/create", {
         map: {
           nodes: roadmapData.nodes,
           edges: roadmapData.edges,

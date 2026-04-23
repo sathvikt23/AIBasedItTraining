@@ -82,9 +82,8 @@ class AITextProcessor:
         
     def generate_roadmap(self,text:str)->str:
 
-        PROMPT=f""""
-        Generata a detaildes roadmap for this topis {text}\n"""
-        +r"""
+        PROMPT=f"""
+        Generata a detaildes roadmap for this topis {text}\n""" +r"""
         Follow these rules to build the roadmap 
         Follow these rules strictly:
 

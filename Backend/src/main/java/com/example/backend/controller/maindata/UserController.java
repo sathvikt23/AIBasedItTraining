@@ -1,4 +1,4 @@
-package Backend.src.main.java.com.example.demo.controller.maindata;
+package com.example.backend.controller.maindata;
 
 import com.example.backend.repositry.dao.User;
 import com.example.backend.service.web.UserService;

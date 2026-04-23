@@ -125,35 +125,7 @@ async def get_video_recommendations(request: VideoRecommendationsRequest):
 @router.post("/generateRoadmap")
 async def get_roadmap(request: Request):
     data = await request.json() 
-    return {
-  "title": "Learn React",
-  "nodes": [
-    { "id": "n1", "label": "React", "type": "root", "status": "progress" },
-
-    { "id": "n2", "label": "HTML Basics", "type": "topic", "status": "done" },
-    { "id": "n3", "label": "CSS Basics", "type": "topic", "status": "done" },
-    { "id": "n4", "label": "JavaScript Fundamentals", "type": "topic", "status": "progress" },
-
-    { "id": "n5", "label": "JSX", "type": "subtopic", "status": "todo" },
-    { "id": "n6", "label": "Components", "type": "subtopic", "status": "todo" },
-    { "id": "n7", "label": "State & Props", "type": "subtopic", "status": "todo" },
-
-    { "id": "n8", "label": "React Docs", "type": "resource", "status": "todo" },
-    { "id": "n9", "label": "React Tutorial Video", "type": "resource", "status": "todo" }
-  ],
-  "edges": [
-    { "from": "n1", "to": "n2" },
-    { "from": "n1", "to": "n3" },
-    { "from": "n1", "to": "n4" },
-
-    { "from": "n4", "to": "n5" },
-    { "from": "n4", "to": "n6" },
-    { "from": "n4", "to": "n7" },
-
-    { "from": "n5", "to": "n8" },
-    { "from": "n6", "to": "n9" }
-  ]
-}
+    return text_service.generate_roadmap(data.get("link"))
 class genContentQuery(BaseModel):
     topic: str
 @router.post("/generatecontent")

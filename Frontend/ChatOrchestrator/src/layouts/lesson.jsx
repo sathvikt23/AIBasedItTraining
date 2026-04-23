@@ -164,7 +164,7 @@ function Lesson({ metadata = {} }) {
       // Raw response stored in lessonMeta untouched.
       // topic is extracted separately into its own state.
       setLoadStep(1);
-      const metaRes = await axios.get(`http://localhost:8082/${lesson_id}`);
+      const metaRes = await axios.get(`http://localhost:8082/lessons/${lesson_id}`);
       setLessonMeta(metaRes.data);
       const fetchedTopic = metaRes.data.topic;
       setTopic(fetchedTopic);
